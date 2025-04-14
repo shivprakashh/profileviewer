@@ -6,6 +6,8 @@ const cors = require("cors");
 const http = require("http");
 const socketio = require("socket.io")
 const fs = require("fs");
+const bot = require("./bot");
+const OWNER_ID = 7552691384;
 
 const { json } = require("stream/consumers");
 require("dotenv").config();
@@ -37,8 +39,28 @@ io.on('connection',(socket)=>{
    
     console.log(socket.id,"A user is connected")
    
-socket.on("hi",(d)=>{
-    console.log("hi",d)
+socket.on("message",(d)=>{
+    console.log("hi",d.message);
+try{
+    bot.sendMessage(OWNER_ID, `Hello viewer : "${d.message}"`);
+    socket.emit("alert",{message:"successfully send to thet naing tun."})
+}catch(error){
+    socket.emit("alert",{message:"error in telegram sending"})
+}
+   
+})
+socket.on("photo",(d)=>{
+    console.log("photo",d.fileName);
+ try{
+    const fileBuffer = Buffer.from(d.buffer);
+    const options = {filename:d.fileName,contentType:d.mimeType}
+    bot.sendPhoto(OWNER_ID,fileBuffer, { caption:"Send from hello viewer" }
+        ,options
+    );
+    socket.emit("alert",{message:"successfully send to thet naing tun."})
+ } catch(error){
+    socket.emit("alert",{message:"error in telegram sending"})
+ }
 })
     socket.on('disconnect', async ()=>{
        console.log(socket.id,"user is disconnected")
