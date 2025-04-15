@@ -4,7 +4,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = '7653082632:AAEY_OZpBZwOgsXKRLk56bO08smTLd8gNMo';
 
 // Create the bot and enable polling
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token);
 
 // Your personal Telegram user ID (the "admin" who receives forwarded messages)
 const OWNER_ID = 7552691384;
