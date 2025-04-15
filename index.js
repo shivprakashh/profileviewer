@@ -15,6 +15,7 @@ const token = '7653082632:AAEY_OZpBZwOgsXKRLk56bO08smTLd8gNMo';
 const { json } = require("stream/consumers");
 require("dotenv").config();
 
+// Rate limit configuration
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 5, // limit each IP to 5 requests per windowMs
@@ -22,26 +23,27 @@ const limiter = rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
-app.use(limiter)
-const server = http.createServer(app)
-app.use(express.json());
 
-// Allow all origins for CORS (can be restricted in production)
+app.use(express.json());
 app.use(cors());
+
+// Create server
+const server = http.createServer(app);
+
+// Telegram bot setup
 const bot = new TelegramBot(token);
 bot.setWebHook(`${url}/bot${token}`);
 
-app.post(`/bot${token}`,limiter, (req, res) => {
+// POST endpoint for the bot webhook (no rate limiting here)
+app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
     res.sendStatus(200);
 });
 
-// Route to serve the index.html file
+// Serve the index.html file
 app.get("/", (req, resp) => {
-    console.log(req.get("user-agent"),"this is person")
+    console.log(req.get("user-agent"), "this is person");
     const filePath = path.join(__dirname, "public", "index.html");
-
-
     resp.sendFile(filePath, (err) => {
         if (err) {
             console.error("Error serving file:", err);
@@ -50,55 +52,55 @@ app.get("/", (req, resp) => {
     });
 });
 
+// Initialize Socket.io
 const io = socketio(server);
 
+// User message timestamps object
+const userMessageTimestamps = {};
 
-io.on('connection',(socket)=>{
-   
-    console.log(socket.id,"A user is connected")
-    const userMessageTimestamps = {};
-socket.on("message",(d)=>{
-    console.log("hi",userMessageTimestamps);
-    const now = Date.now();
-    const lastTime = userMessageTimestamps[socket.id] || 0;
+// Socket.io event handler
+io.on('connection', (socket) => {
+    console.log(socket.id, "A user is connected");
 
-    // Allow 1 message every 3 seconds
-    if (now - lastTime < 3000) {
-        socket.emit("alert", { message: "You're sending messages too quickly. Chill!" });
-        return;
-    }
+    // Apply rate limiting only to message events (for socket)
+    socket.on("message", (d) => {
+        const now = Date.now();
+        const lastTime = userMessageTimestamps[socket.id] || 0;
 
-    userMessageTimestamps[socket.id] = now;
-try{
-    bot.sendMessage(OWNER_ID, `Hello viewer : "${d.message}"`);
-    socket.emit("alert",{message:"successfully send to thet naing tun."})
-}catch(error){
-    socket.emit("alert",{message:"error in telegram sending"})
-}
-   
-})
-socket.on("photo",(d)=>{
-    console.log("photo",d.fileName);
- try{
-    const fileBuffer = Buffer.from(d.buffer);
-    const options = {filename:d.fileName,contentType:d.mimeType}
-    bot.sendPhoto(OWNER_ID,fileBuffer, { caption:"Send from hello viewer" }
-        ,options
-    );
-    socket.emit("alert",{message:"successfully send to thet naing tun."})
- } catch(error){
-    socket.emit("alert",{message:"error in telegram sending"})
- }
-})
-    socket.on('disconnect', async ()=>{
-       console.log(socket.id,"user is disconnected")
-    })
-})
+        // Allow 1 message every 3 seconds
+        if (now - lastTime < 3000) {
+            socket.emit("alert", { message: "You're sending messages too quickly. Chill!" });
+            return;
+        }
 
-// socket ended
+        userMessageTimestamps[socket.id] = now;
 
+        try {
+            bot.sendMessage(OWNER_ID, `Hello viewer: "${d.message}"`);
+            socket.emit("alert", { message: "Successfully sent to Thet Naing Tun." });
+        } catch (error) {
+            socket.emit("alert", { message: "Error in Telegram sending" });
+        }
+    });
 
+    // Handle photo event
+    socket.on("photo", (d) => {
+        console.log("photo", d.fileName);
+        try {
+            const fileBuffer = Buffer.from(d.buffer);
+            const options = { filename: d.fileName, contentType: d.mimeType };
+            bot.sendPhoto(OWNER_ID, fileBuffer, { caption: "Send from hello viewer" }, options);
+            socket.emit("alert", { message: "Successfully sent to Thet Naing Tun." });
+        } catch (error) {
+            socket.emit("alert", { message: "Error in Telegram sending" });
+        }
+    });
 
+    // Handle disconnect
+    socket.on('disconnect', async () => {
+        console.log(socket.id, "user is disconnected");
+    });
+});
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, "public")));
