@@ -34,7 +34,7 @@
       background-color: white;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 10px;
       padding: 10px;
       align-items: center;
     }
@@ -45,7 +45,7 @@
   width: 100%;
   height: 90%;
   overflow-y: scroll;
-  border: 1px solid #dddddd;
+  border: 2px dashed #dddddd;
   border-radius: 10px;
   padding: 10px;
   box-sizing: border-box;
@@ -72,25 +72,27 @@
   object-fit: cover;
 }
     .inputcon {
-      width: auto;
+      width: 80%;
       height: 10%;
       box-shadow: 0px 4px 6px 1px rgb(209, 208, 208);
       border-radius: 10px;
       box-sizing: border-box;
+      border:2px solid rgb(17, 17, 17);
       display: flex;
       flex-direction: row;
-      align-items: center;
+     align-items: center;
       gap: 10px;
-      padding: 10px;
-      justify-content: center;
+      padding: 3px 10px;
+  
     }
     #input {
-      width: 600px;
+      
+      width: 100%;
       padding: 3px 10px;
-      height: 90%;
+      height: 100%;
       font-size: 16px;
       border: none;
-      border-right: 3px solid rgb(0, 0, 0);
+      border-right: 1px solid #dddddd;
     }
     #input:focus {
       outline: none;
@@ -99,14 +101,23 @@
       width: auto;
       height: 100%;
       position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .img:hover, #sendimg:hover {
+    .imgsend:hover, #sendimg:hover {
       border: 2px solid red;
       cursor: pointer;
     }
     #sendimg {
-      width: auto;
-      height: 90%;
+      width: 40px ;
+      height: 40px ;
+      background-color: rgb(255, 255, 255);
+      border-radius: 50%;
+      padding:10px;
+      object-fit: cover;
+      border:2px solid rgb(4, 150, 255);
+      box-sizing: border-box;
     }
     .usertext {
       padding: 4px 10px;
@@ -122,42 +133,59 @@
       left: 0px;
     }
     .imgsend {
-      width: 100%;
-      height: 100%;
+      width: 40px ;
+
+      height: 40px;
+      padding:7px;
+      border-radius: 50%;
+     border: 2px solid brown;
     }
+    
     @media (max-width: 800px) {
       .conin {
         width: 100%;
         height: 100%;
       }
+      .chat{
+        width:100%;
+
+      }
+      .chatcon{
+        width:100%;
+      }
       #sendimg {
-        width: 30px;
+        width: 40px;
+        height:40px;
       }
       #input {
-        width: 200px;
+        width:80%;
         font-size: 13px;
       }
       .img {
-        width: 30px;
+        width: 40px;
       }
       .inputcon {
         width: 98%;
         border: 1px solid #dddddd;
       }
     }
+    .datahave{
+      background-color: rgb(4, 196, 255) !important;
+      box-shadow: 0px 0px 10px 1px rgb(203, 201, 201);
+    }
   </style>
 </head>
 <body>
   <div class="con">
     <div class="conin">
-      <h3>Send text or image🥺 to Thet Naing Tun anonymously..</h3>
+      <h3>Send text🥺 to Thet Naing Tun..</h3>
       <p>Thet Naing tun will reply you here...</p>
       <div class="chat">
         <div class="chatcon"></div>
       </div>
       <div class="inputcon">
         <input type="text" id="input" placeholder="Tell me anything you want to say..">
-        <img id="sendimg" src="send.png"/>
+        <img id="sendimg" src="up-arrow.png"/>
         <div class="img">
           <input class="file" type="file">
           <img class="imgsend" src="image.png"/>
@@ -181,8 +209,14 @@
     });
 
     input.addEventListener("keydown", function(event) {
+      
+      sendtext.classList.add("datahave");
+      if(!input.value){
+        sendtext.classList.remove("datahave")
+      }
       if (event.key === "Enter") {
         send();
+        sendtext.classList.remove("datahave")
       }
     });
 
