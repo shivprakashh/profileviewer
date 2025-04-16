@@ -31,9 +31,9 @@ app.use(cors());
 const server = http.createServer(app);
 
 // Telegram bot setup
-//const bot = new TelegramBot(token);
-//bot.setWebHook(`${url}/bot${token}`);
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token);
+bot.setWebHook(`${url}/bot${token}`);
+//const bot = new TelegramBot(token, { polling: true });
 // POST endpoint for the bot webhook (no rate limiting here)
 app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
