@@ -31,9 +31,9 @@ app.use(cors());
 const server = http.createServer(app);
 
 // Telegram bot setup
-const bot = new TelegramBot(token);
-bot.setWebHook(`${url}/bot${token}`);
-//const bot = new TelegramBot(token, { polling: true });
+//const bot = new TelegramBot(token);
+//bot.setWebHook(`${url}/bot${token}`);
+const bot = new TelegramBot(token, { polling: true });
 // POST endpoint for the bot webhook (no rate limiting here)
 app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
@@ -57,8 +57,62 @@ const io = socketio(server);
 
 // User message timestamps object
 const userMessageTimestamps = {};
+const axios = require('axios');  // Import axios for HTTP requests
+
+bot.on('photo', async (msg) => {
+  if (msg.reply_to_message) {
+    console.log("This photo was sent as a reply to:", msg.reply_to_message.text);
+  }
+
+  // Get the largest size photo
+  const photo = msg.photo[msg.photo.length - 1];
+  console.log("Photo file_id:", photo.file_id);
+
+  const replyTo = msg.reply_to_message;
+  const replyText = msg.caption || "[Photo with no caption]";
+
+  if (replyTo && replyTo.text) {
+    const match = replyTo.text.match(/\[(.+?)\]/);
+    const socketId = match ? match[1] : null;
+
+    if (socketId && io.sockets.sockets.get(socketId)) {
+      try {
+        // Get the file path from Telegram API using the file_id
+        const fileInfo = await bot.getFile(photo.file_id);
+        const filePath = fileInfo.file_path;
+
+        // Construct the full file URL to download the image (this includes the bot token, but is not exposed to the client)
+        const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
+
+        // Download the image as binary data (buffer) using axios
+        const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+
+        // Convert the image response data to a buffer
+        const imageBuffer = Buffer.from(response.data);
+
+        // Emit to the correct socket with the buffer and other data
+        io.to(socketId).emit('reply', {
+          text: replyText,
+          imageBuffer: imageBuffer.toString('base64'),  // Send the image as a base64-encoded string
+        });
+
+        console.log(`✅ Sent reply to socket ${socketId}: ${replyText}`);
+        console.log(`🖼️ Image Buffer (Base64):`, imageBuffer.toString('base64'));
+      } catch (err) {
+        console.error("❌ Error fetching photo from Telegram:", err);
+      }
+    } else {
+      console.log('❌ Invalid or disconnected socket ID');
+    }
+  } else {
+    console.log('ℹ️ Not a reply to a user message. Ignored.');
+  }
+});
+
+  
 bot.on('message', (msg) => {
      console.log("entering into reply message")
+   if(!msg.photo){
     const replyText = msg.text;
     const replyTo = msg.reply_to_message;
  
@@ -79,12 +133,13 @@ bot.on('message', (msg) => {
     } else {
       console.log('ℹ️ Not a reply to a user message. Ignored.');
     }
+   }
   });
 
 // Socket.io event handler
 io.on('connection', (socket) => {
     console.log(socket.id, "A user is connected");
-
+    bot.sendMessage(OWNER_ID,`[${socket.id}] a user is connected!`);
     // Apply rate limiting only to message events (for socket)
     socket.on("message", (d) => {
         const now = Date.now();

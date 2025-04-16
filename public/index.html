@@ -66,8 +66,11 @@
   margin-top: auto;
 }
 
-
-
+.thetimg{
+  width:auto;
+  height:100px;
+  object-fit: cover;
+}
     .inputcon {
       width: auto;
       height: 10%;
@@ -148,7 +151,7 @@
   <div class="con">
     <div class="conin">
       <h3>Send text or image🥺 to Thet Naing Tun anonymously..</h3>
-      <p>Whatever you send me here, I will receive it on my telegram account as soon as you send it.</p>
+      <p>Thet Naing tun will reply you here...</p>
       <div class="chat">
         <div class="chatcon"></div>
       </div>
@@ -165,8 +168,8 @@
 
   <script>
     const img = document.querySelector(".file");
-    const url = "https://hello-2x7x.onrender.com";
-    const ur = "http://localhost:4000"; // Change to `ur` if deploying
+    const ur = "https://hello-2x7x.onrender.com";
+    const url = "http://localhost:4000"; // Change to `ur` if deploying
     const socket = io(url);
 
     const con = document.querySelector('.chatcon');
@@ -217,6 +220,9 @@
       const reader = new FileReader();
       reader.onload = function() {
         let arrayBuffer = reader.result;
+        const blob = new Blob([arrayBuffer], { type: file.type });
+        const url = URL.createObjectURL(blob);
+        imgdisplay("Left",url)
         socket.emit("photo", {
           buffer: arrayBuffer,
           fileName: file.name,
@@ -227,11 +233,33 @@
     });
 
     socket.on("reply", (d) => {
-      alert("reply");
+     
+      
+      if(d.imageBuffer){
+      imgdisplay("Right",d.imageBuffer)
+      }
+     else{
       display(d.text);
       console.log(d, "reply is getting");
+     }
     });
+function imgdisplay(position,imageBuffer){
+  
 
+// Convert the base64-encoded string back to a data URL
+const src = `data:image/jpeg;base64,${imageBuffer}`;
+  let img = document.createElement("img");
+      img.classList.add("thetimg");
+    if(position === "Left"){
+      img.style.marginLeft = "auto";
+    }else{
+      img.style.marginRight = "auto";
+    }
+      img.src = src
+     
+      con.appendChild(img)
+      scrollToBottom();
+}
     socket.on("alert", (d) => {
       alert(d.message);
     });
