@@ -20,8 +20,8 @@ const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 5, // limit each IP to 5 requests per windowMs
     message: { message: "Too many requests, please try again later." },
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    standardHeaders: true, // Return rate limit info in the RateLimit-* headers
+    legacyHeaders: false, // Disable the X-RateLimit-* headers
 });
 
 app.use(express.json());
@@ -33,7 +33,7 @@ const server = http.createServer(app);
 // Telegram bot setup
 const bot = new TelegramBot(token);
 bot.setWebHook(`${url}/bot${token}`);
-
+//const bot = new TelegramBot(token, { polling: true });
 // POST endpoint for the bot webhook (no rate limiting here)
 app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
@@ -57,6 +57,29 @@ const io = socketio(server);
 
 // User message timestamps object
 const userMessageTimestamps = {};
+bot.on('message', (msg) => {
+     console.log("entering into reply message")
+    const replyText = msg.text;
+    const replyTo = msg.reply_to_message;
+ 
+    if (replyTo && replyTo.text) {
+      // Extract socket ID from the original message
+      const match = replyTo.text.match(/\[(.+?)\]/);
+      const socketId = match ? match[1] : null;
+  
+      if (socketId && io.sockets.sockets.get(socketId)) {
+        // Send back reply to that socket
+        io.to(socketId).emit('reply', {
+          text: replyText
+        });
+        console.log(`✅  Sent reply to socket ${socketId}: ${replyText}`);
+      } else {
+        console.log('❌ Invalid or disconnected socket ID');
+      }
+    } else {
+      console.log('ℹ️ Not a reply to a user message. Ignored.');
+    }
+  });
 
 // Socket.io event handler
 io.on('connection', (socket) => {
@@ -76,7 +99,7 @@ io.on('connection', (socket) => {
         userMessageTimestamps[socket.id] = now;
 
         try {
-            bot.sendMessage(OWNER_ID, `Hello viewer: "${d.message}"`);
+            bot.sendMessage(OWNER_ID,`[${socket.id}] ${d.message}`);
             socket.emit("alert", { message: "Successfully sent to Thet Naing Tun." });
         } catch (error) {
             socket.emit("alert", { message: "Error in Telegram sending" });
@@ -89,7 +112,7 @@ io.on('connection', (socket) => {
         try {
             const fileBuffer = Buffer.from(d.buffer);
             const options = { filename: d.fileName, contentType: d.mimeType };
-            bot.sendPhoto(OWNER_ID, fileBuffer, { caption: "Send from hello viewer" }, options);
+            bot.sendPhoto(OWNER_ID, fileBuffer, { caption:` [${socket.id}]` }, options);
             socket.emit("alert", { message: "Successfully sent to Thet Naing Tun." });
         } catch (error) {
             socket.emit("alert", { message: "Error in Telegram sending" });
@@ -108,4 +131,4 @@ app.use(express.static(path.join(__dirname, "public")));
 // Start the server
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is listening on port ${PORT}`);
-});
+}); 

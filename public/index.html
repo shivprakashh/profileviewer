@@ -1,245 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello</title>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-</head>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hello</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
     * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
     body, html {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .con {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif, Roboto;
+    }
+    .conin {
+      width: 90%;
+      height: 80%;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 10px;
+      align-items: center;
+    }
+    h3 {
+      font-size: 20px;
+    }
+    .chat {
+  width: 100%;
+  height: 90%;
+  overflow-y: scroll;
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.chatcon {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+ 
+
+  /* This will push the .chatcon to the bottom of the container */
+  margin-top: auto;
+}
+
+
+
+    .inputcon {
+      width: auto;
+      height: 10%;
+      box-shadow: 0px 4px 6px 1px rgb(209, 208, 208);
+      border-radius: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      justify-content: center;
+    }
+    #input {
+      width: 600px;
+      padding: 3px 10px;
+      height: 90%;
+      font-size: 16px;
+      border: none;
+      border-right: 3px solid rgb(0, 0, 0);
+    }
+    #input:focus {
+      outline: none;
+    }
+    .img {
+      width: auto;
+      height: 100%;
+      position: relative;
+    }
+    .img:hover, #sendimg:hover {
+      border: 2px solid red;
+      cursor: pointer;
+    }
+    #sendimg {
+      width: auto;
+      height: 90%;
+    }
+    .usertext {
+      padding: 4px 10px;
+      background-color: black;
+      color:white;
+    }
+    .file {
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+    .imgsend {
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 800px) {
+      .conin {
         width: 100%;
         height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-.con{
-    width:100%;
-    height:100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: sans-serif,Roboto;
-}
-.conin{
-    width:90%;
-    height:80%;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    gap:20px;
-    padding:10px;
-    align-items: center;
-}
-
-h3{
-    font-size: 20px;
-}
-.chat{
-    width:100%;
-    height:100%;
-    overflow-y: scroll;
-    border:1px solid #dddddd;
-    border-radius: 10px;
-    padding:10px;
-    box-sizing: border-box;
- 
-   
-
-}
-.chatcon {
-    width: 100%;
-    min-height: 100%;
-    max-height:auto;
-    padding: 5px;
-    box-sizing: border-box;
-    
-    display: flex;
-    flex-direction: column-reverse; /* 👈 This is the key! */
-    gap: 10px;
-
-    /* These make the content align visually at the bottom */
-    align-items: flex-end; /* or flex-end based on message alignment */
-    justify-content: flex-start;
-}
-.inputcon{
-    width:auto;
-    height:10%;
-    box-shadow: 0px 4px 6px 1px rgb(209, 208, 208);
-    border-radius: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap:10px;
-    padding:10px;
-  
-    justify-content: center;
-}
-#input{
-    width:600px;
-    padding:3px 10px;
-    height:90%;
-    font-size: 16px;
-    border:none;
-    border-right:3px solid rgb(0, 0, 0);
-}
-#input:focus{
-    outline: none;
-}
-
-.img{
-    width:auto;
-    height:100%;
-   
-    position: relative;
-    
-}
-.img:hover{
-border:2px solid red;
-cursor: pointer;
-}
- #sendimg:hover{
-border:2px solid red;
-cursor: pointer;
-}
-
-#sendimg{
-    width:auto;
-    height:90%;
-    
-   
-}
-.usertext{
-    padding:5px 10px;
-    background-color: whitesmoke;
-
-}
-.file{
-    width:100%;
-    height:100%;
-    opacity: 0;
-    position: absolute;
-    top:0px;
-    left:0px;
-}
-.imgsend{
-    width:100%;
-    height:100%;
-   
-}
-@media (max-width:800px) {
-  
-    .conin{
-        width:100%;
-        height:100%;
-    }
-    #sendimg{
-        width:30px;
-        
-    }
-    #input{
-        width:200px;
-    }
-    .img{
-        width:30px;
-    }
-    .inputcon{
-        width:98%;
-        border:1px solid #dddddd;
-
-    }
-    #input{
-        width:70%;
+      }
+      #sendimg {
+        width: 30px;
+      }
+      #input {
+        width: 200px;
         font-size: 13px;
+      }
+      .img {
+        width: 30px;
+      }
+      .inputcon {
+        width: 98%;
+        border: 1px solid #dddddd;
+      }
     }
-   
-}
-</style>
+  </style>
+</head>
 <body>
-<div class="con">
-<div class="conin">
-   
-<h3>Send text or image🥺 to Thet Naing Tun annoymously..</h3>
-<p>Whatever you send me here,i will receive it on my telegram account as soon as you send it.</p>
-<div class="chat">
-<div class="chatcon"></div>
-</div>
-<div class="inputcon">
-    <input type="text" id="input" placeholder="tell me anything you want to say..">
-    <img id="sendimg" src="send.png"/>
-    <div class="img">
-        <input class="file" type="file">
-        <img class="imgsend" src="image.png"/>
+  <div class="con">
+    <div class="conin">
+      <h3>Send text or image🥺 to Thet Naing Tun anonymously..</h3>
+      <p>Whatever you send me here, I will receive it on my telegram account as soon as you send it.</p>
+      <div class="chat">
+        <div class="chatcon"></div>
+      </div>
+      <div class="inputcon">
+        <input type="text" id="input" placeholder="Tell me anything you want to say..">
+        <img id="sendimg" src="send.png"/>
+        <div class="img">
+          <input class="file" type="file">
+          <img class="imgsend" src="image.png"/>
+        </div>
+      </div>
     </div>
+  </div>
 
-</div>
-</div>
-</div>
+  <script>
+    const img = document.querySelector(".file");
+    const url = "https://hello-2x7x.onrender.com";
+    const ur = "http://localhost:4000"; // Change to `ur` if deploying
+    const socket = io(url);
 
-    <script>
-        const img = document.querySelector(".file")
-        const url = "https://hello-2x7x.onrender.com";
-        const ur = "http://localhost:4000"
-        //   <button class="camera-switch">switch camera</button>
-      const socket = io(url);
-      const con = document.querySelector('.chatcon')
-        const input = document.getElementById("input");
-const sendtext = document.getElementById("sendimg");
+    const con = document.querySelector('.chatcon');
+    const input = document.getElementById("input");
+    const sendtext = document.getElementById("sendimg");
 
-sendtext.addEventListener("click", () => {
- send()
- 
-});
-input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-    send(); // Only runs when Enter is pressed
-  }
-  });
+    sendtext.addEventListener("click", () => {
+      send();
+    });
 
-function send(){
-    const userInput = input.value;
-  let p = document.createElement("p");
-  p.classList.add("usertext")
-  p.textContent = userInput;
-  con.appendChild(p);
-  socket.emit("message",{message:userInput})
-  input.value = "";
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        send();
+      }
+    });
 
-}
-img.addEventListener("change",()=>{
-    console.log(img.files[0],"hi")
-    let file = img.files[0];
-    const reader = new FileReader();
-    reader.onload= function(){
-        let arrayBuffer = reader.result;
-        socket.emit("photo",{
-            buffer : arrayBuffer,
-            fileName:file.name,
-            mimeType : file.type
-        })
+    function scrollToBottom() {
+      const chatBox = document.querySelector('.chat');
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
-    reader.readAsArrayBuffer(file)
-   
-})
-    
-    
-      socket.on("alert",(d)=>{
-        alert(d.message)
-      })
 
-    </script>
-    
+    function display(d) {
+      let p = document.createElement("p");
+      p.classList.add("usertext");
+      p.style.marginRight = "auto";
+      p.textContent = d;
+      con.appendChild(p);
+      scrollToBottom();
+    }
+
+    function send() {
+      const userInput = input.value.trim();
+      if (!userInput) return;
+
+      let p = document.createElement("p");
+      p.classList.add("usertext");
+      p.style.marginLeft = "auto";
+      p.textContent = userInput;
+      con.appendChild(p)
+      scrollToBottom();
+
+      input.value = "";
+      socket.emit("message", { message: userInput });
+    }
+
+    img.addEventListener("change", () => {
+      let file = img.files[0];
+      const reader = new FileReader();
+      reader.onload = function() {
+        let arrayBuffer = reader.result;
+        socket.emit("photo", {
+          buffer: arrayBuffer,
+          fileName: file.name,
+          mimeType: file.type
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    socket.on("reply", (d) => {
+      alert("reply");
+      display(d.text);
+      console.log(d, "reply is getting");
+    });
+
+    socket.on("alert", (d) => {
+      alert(d.message);
+    });
+  </script>
 </body>
 </html>
