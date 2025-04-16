@@ -60,9 +60,7 @@ const userMessageTimestamps = {};
 const axios = require('axios');  // Import axios for HTTP requests
 
 bot.on('photo', async (msg) => {
-  if (msg.reply_to_message) {
-    console.log("This photo was sent as a reply to:", msg.reply_to_message.text);
-  }
+ 
 
   // Get the largest size photo
   const photo = msg.photo[msg.photo.length - 1];
@@ -96,8 +94,7 @@ bot.on('photo', async (msg) => {
           imageBuffer: imageBuffer.toString('base64'),  // Send the image as a base64-encoded string
         });
 
-        console.log(`✅ Sent reply to socket ${socketId}: ${replyText}`);
-        console.log(`🖼️ Image Buffer (Base64):`, imageBuffer.toString('base64'));
+       
       } catch (err) {
         console.error("❌ Error fetching photo from Telegram:", err);
       }
