@@ -255,8 +255,9 @@
       reader.onload = function() {
         let arrayBuffer = reader.result;
         const blob = new Blob([arrayBuffer], { type: file.type });
-        const url = URL.createObjectURL(blob);
-        imgdisplay("Left",url)
+        const srcc = URL.createObjectURL(blob);
+        console.log(url,"url")
+        imgdisplay("Left",srcc)
         socket.emit("photo", {
           buffer: arrayBuffer,
           fileName: file.name,
@@ -286,10 +287,12 @@ const src = `data:image/jpeg;base64,${imageBuffer}`;
       img.classList.add("thetimg");
     if(position === "Left"){
       img.style.marginLeft = "auto";
+      img.src = imageBuffer
     }else{
       img.style.marginRight = "auto";
-    }
       img.src = src
+    }
+      
      
       con.appendChild(img)
       scrollToBottom();
