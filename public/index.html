@@ -178,8 +178,8 @@
 <body>
   <div class="con">
     <div class="conin">
-      <h3>Send text🥺 to Thet Naing Tun..</h3>
-      <p>Thet Naing tun will reply you here...</p>
+      <h3>Chat with Thet Naing Tun..</h3>
+      <p>Thet will get notification.</p>
       <div class="chat">
         <div class="chatcon"></div>
       </div>
@@ -298,7 +298,7 @@ const src = `data:image/jpeg;base64,${imageBuffer}`;
       scrollToBottom();
 }
     socket.on("alert", (d) => {
-      alert(d.message);
+      console.log("duccess")
     });
   </script>
 </body>
